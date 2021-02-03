@@ -1,0 +1,25 @@
+{
+    "name": "bedita/tus",
+    "description": "BEdita/Tus plugin for CakePHP",
+    "type": "cakephp-plugin",
+    "license": "LGPL-3.0-or-later",
+    "require": {
+        "bedita/core": "*",
+        "bedita/api": "*",
+        "ankitpokhrel/tus-php": "^2.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.14|^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BEdita\\Tus\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BEdita\\Tus\\Test\\": "tests/",
+            "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
+        }
+    }
+}
