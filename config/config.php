@@ -15,7 +15,7 @@ return [
         'filesystem' => env('TUS_FILESYSTEM', 'tus'),
 
         /*
-         * Upload directory.
+         * Upload directory of filesystem configured.
          */
         'uploadDir' => env('TUS_UPLOAD_DIR', 'uploads'),
 
