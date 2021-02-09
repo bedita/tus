@@ -9,7 +9,8 @@
         "ankitpokhrel/tus-php": "^2.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7.14|^6.0"
+        "phpunit/phpunit": "^5.7.14|^6.0",
+        "cakephp/cakephp-codesniffer": "^3.3.0"
     },
     "autoload": {
         "psr-4": {
@@ -21,5 +22,9 @@
             "BEdita\\Tus\\Test\\": "tests/",
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
         }
+    },
+    "scripts": {
+        "cs-check": "vendor/bin/phpcs -p src/ tests/",
+        "cs-fix": "vendor/bin/phpcbf -p src/ tests/"
     }
 }
