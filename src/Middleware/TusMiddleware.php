@@ -60,7 +60,7 @@ class TusMiddleware
     {
         $path = $request->getUri()->getPath();
         if ($request->getMethod() === 'OPTIONS' && strpos($path, $this->getConfig('endpoint')) === 0) {
-            $next($request, $response); // skip CORS middleware
+            $next($request, $response); // skip BEdita/API CORS middleware
         }
 
         return $next($request, $response);

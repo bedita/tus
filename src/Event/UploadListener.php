@@ -18,6 +18,7 @@ use BEdita\Core\Model\Action\SaveEntityAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Table\MediaTable;
+use BEdita\Core\Model\Table\StreamsTable;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -90,7 +91,13 @@ class UploadListener
         }
 
         $this->setTable($objectType->alias);
-        $this->Streams = $this->getTableLocator()->get('Streams');
+
+        // force a new instance of StreamsTable to ensure to not modifing existing one
+        $this->Streams = $this->getTableLocator()->get('TusStreams', [
+            'className' => StreamsTable::class,
+        ]);
+
+        $this->Streams->addBehavior('BEdita/Tus.RelaxStreams');
     }
 
     /**
@@ -153,13 +160,9 @@ class UploadListener
             // move file to default place and save stream
             $srcPath = sprintf('%s://%s/%s', $this->getConfig('filesystem'), $this->getConfig('uploadDir'), $fileMeta['name']);
 
-            $stream = $this->Streams->newEntity(
-                [
-                    'file_name' => $fileMeta['name'],
-                    'mime_type' => Hash::get($fileMeta, 'metadata.type'),
-                ],
-                ['validate' => false], // skipped to avoid validation error on missing content
-            );
+            $stream = $this->Streams->newEntity();
+            $stream->file_name = $fileMeta['name'];
+            $stream->mime_type = Hash::get($fileMeta, 'metadata.type');
             $stream->uri = $stream->filesystemPath();
             $stream->file_size = Hash::get($fileMeta, 'size');
             $stream->hash_md5 = '';
@@ -183,7 +186,7 @@ class UploadListener
             $stream = $action([
                 'entity' => $stream,
                 'data' => [],
-                'entityOptions' => ['validate' => false], // skipped to avoid validation error on missing content
+                'entityOptions' => ['validate' => 'relax'],
             ]);
 
             $action = new GetObjectAction(['table' => $this->Table, 'objectType' => $objectType]);
