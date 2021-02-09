@@ -1,4 +1,4 @@
-# BEdita/Tus plugin for CakePHP
+# Tus plugin for BEdita
 
 This plugin enable BEdita API to use [tus](https://tus.io/) protocol to upload files and create associated BEdita media object types.
 
@@ -18,7 +18,7 @@ The `config/config.php` contains the configurations needed.
 
 ## Usage
 
-By default the plugin exposes a route `/tus` (configurable via `endpoint` key`) on which the tus server will respond.
+By default the plugin exposes a route `/tus` (configurable via `endpoint` key) on which the tus server will respond.
 The client must send a tus request to `/tus/{type}` where `{type}` is the object type that you want
 associate to the file uploaded.
 The upload request must contain a bearer authorization header as expected from BEdita API.
