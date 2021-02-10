@@ -34,7 +34,7 @@ class CorsExtenderMiddleware implements TusMiddleware
         $headers['Access-Control-Expose-Headers'] .= sprintf(
             ', %s, %s',
             Server::BEDITA_OBJECT_ID_HEADER,
-            Server::BEDITA_OBJECT_TYPE_HEADER,
+            Server::BEDITA_OBJECT_TYPE_HEADER
         );
         $response->replaceHeaders($headers);
     }

@@ -136,7 +136,7 @@ class ServerFactory
             $this->uploadPath = sprintf(
                 's3://%s/%s',
                 $adapter->getConfig('host'), // bucket.
-                $this->getConfig('uploadDir'),
+                $this->getConfig('uploadDir')
             );
 
             return $this;
