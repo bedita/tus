@@ -176,7 +176,9 @@ class UploadListener
             // create media type
             $entity = $this->Table->newEntity();
             $entity->set('type', $this->Table->objectType()->name);
-            $data = ['title' => $fileMeta['name']];
+            $data = [
+                'title' => Hash::get($fileMeta, 'metadata.title', $fileMeta['name']),
+            ];
             $action = new SaveEntityAction(['table' => $this->Table]);
             $entity = $action(compact('entity', 'data'));
 
