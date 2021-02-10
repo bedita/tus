@@ -18,7 +18,6 @@ use BEdita\Core\Filesystem\FilesystemRegistry;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Http\Exception\InternalErrorException;
 use TusPhp\Config as TusConfig;
-use TusPhp\Tus\Server;
 
 /**
  * Factory for Tus Server
@@ -50,7 +49,7 @@ class ServerFactory
     /**
      * Instance of Tus server
      *
-     * @var \TusPhp\Tus\Server
+     * @var \BEdita\Tus\Http\Server
      */
     protected $tusServer = null;
 
@@ -71,7 +70,7 @@ class ServerFactory
      * Create Tus server.
      *
      * @param array $config Configuration
-     * @return \TusPhp\Tus\Server
+     * @return \BEdita\Tus\Http\Server
      */
     public static function create(array $config = []): Server
     {
@@ -81,7 +80,7 @@ class ServerFactory
     /**
      * Get configured Tus Server.
      *
-     * @return \TusPhp\Tus\Server
+     * @return \BEdita\Tus\Http\Server
      */
     public function getServer(): Server
     {

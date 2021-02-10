@@ -12,7 +12,7 @@
  */
 namespace BEdita\Tus\Middleware\Tus;
 
-use BEdita\Tus\Event\UploadListener;
+use BEdita\Tus\Http\Server;
 use TusPhp\Middleware\TusMiddleware;
 use TusPhp\Request;
 use TusPhp\Response;
@@ -33,8 +33,8 @@ class CorsExtenderMiddleware implements TusMiddleware
         $headers['Access-Control-Allow-Headers'] .= ', Authorization';
         $headers['Access-Control-Expose-Headers'] .= sprintf(
             ', %s, %s',
-            UploadListener::BEDITA_OBJECT_ID_HEADER,
-            UploadListener::BEDITA_OBJECT_TYPE_HEADER,
+            Server::BEDITA_OBJECT_ID_HEADER,
+            Server::BEDITA_OBJECT_TYPE_HEADER,
         );
         $response->replaceHeaders($headers);
     }

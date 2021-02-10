@@ -19,6 +19,7 @@ use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Table\MediaTable;
 use BEdita\Core\Model\Table\StreamsTable;
+use BEdita\Tus\Http\Server;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -33,20 +34,6 @@ class UploadListener
 {
     use InstanceConfigTrait;
     use LocatorAwareTrait;
-
-    /**
-     * BEdita object id header
-     *
-     * @var string
-     */
-    public const BEDITA_OBJECT_ID_HEADER = 'BEdita-Object-Id';
-
-    /**
-     * BEdita object type header
-     *
-     * @var string
-     */
-    public const BEDITA_OBJECT_TYPE_HEADER = 'BEdita-Object-Type';
 
     /**
      * StreamsTable instance.
@@ -130,8 +117,8 @@ class UploadListener
         try {
             $entity = $this->finalize($event->getFile());
             $response->setHeaders([
-                self::BEDITA_OBJECT_ID_HEADER => $entity->id,
-                self::BEDITA_OBJECT_TYPE_HEADER => $entity->type,
+                Server::BEDITA_OBJECT_ID_HEADER => $entity->id,
+                Server::BEDITA_OBJECT_TYPE_HEADER => $entity->type,
             ]);
         } catch (\Exception $e) {
             throw $e;
