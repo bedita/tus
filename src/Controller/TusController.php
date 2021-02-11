@@ -16,11 +16,13 @@ use BEdita\Tus\Event\UploadListener;
 use BEdita\Tus\Http\ResponseTrait;
 use BEdita\Tus\Http\ServerFactory;
 use BEdita\Tus\Middleware\Tus\CorsExtenderMiddleware;
+use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
 use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\Event\Event;
 use Cake\Http\Exception\BadRequestException;
+use Cake\Utility\Hash;
 use TusPhp\Events\UploadComplete;
 
 /**
@@ -94,7 +96,11 @@ class TusController extends Controller
         $tusConf = Configure::read('Tus');
         $tusConf['endpoint'] .= '/' . $type;
         $server = ServerFactory::create($tusConf);
-        $server->middleware()->add(CorsExtenderMiddleware::class);
+
+        $trustedProxies = new TrustProxiesMiddleware((array)Hash::get($tusConf, 'trustedProxies'));
+        $server->middleware()
+            ->add(CorsExtenderMiddleware::class)
+            ->add($trustedProxies);
 
         $listener = new UploadListener(['objectType' => $objectType] + $tusConf);
         $server->event()->addListener(UploadComplete::NAME, [$listener, 'onUploadComplete']);

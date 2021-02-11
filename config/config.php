@@ -48,5 +48,13 @@ return [
                 'name' => env('TUS_CACHE_FILE', 'tus_php.server.cache'),
             ],
         ],
+
+        /*
+         * Trusted Proxies config.
+         */
+        'trustedProxies' => [
+            'proxies' => env('TUS_TRUSTED_PROXIES', '*'),
+            'headers' => env('TUS_TRUSTED_HEADERS'),
+        ],
     ],
 ];
