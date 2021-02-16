@@ -56,5 +56,15 @@ return [
             'proxies' => env('TUS_TRUSTED_PROXIES', '*'),
             'headers' => env('TUS_TRUSTED_HEADERS'),
         ],
+
+        /*
+         * Headers configuration:
+         *
+         * - `exclude` => headers that Tus server shouldn't set.
+         *                Can be an array or a comma separated string.
+         */
+        'headers' => [
+            'exclude' => env('TUS_HEADERS_EXCLUDE'),
+        ],
     ],
 ];

@@ -15,7 +15,7 @@ namespace BEdita\Tus\Controller;
 use BEdita\Tus\Event\UploadListener;
 use BEdita\Tus\Http\ResponseTrait;
 use BEdita\Tus\Http\ServerFactory;
-use BEdita\Tus\Middleware\Tus\CorsExtenderMiddleware;
+use BEdita\Tus\Middleware\Tus\HeadersMiddleware;
 use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
 use Cake\Controller\Controller;
 use Cake\Core\Configure;
@@ -97,9 +97,10 @@ class TusController extends Controller
         $tusConf['endpoint'] .= '/' . $type;
         $server = ServerFactory::create($tusConf);
 
+        $headersMiddleware = new HeadersMiddleware((array)Hash::get($tusConf, 'headers'));
         $trustedProxies = new TrustProxiesMiddleware((array)Hash::get($tusConf, 'trustedProxies'));
         $server->middleware()
-            ->add(CorsExtenderMiddleware::class)
+            ->add($headersMiddleware)
             ->add($trustedProxies);
 
         $listener = new UploadListener(['objectType' => $objectType] + $tusConf);
