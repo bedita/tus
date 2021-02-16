@@ -31,7 +31,9 @@ class Plugin extends BasePlugin
     {
         parent::bootstrap($app);
 
-        Configure::load('BEdita/Tus.config');
+        if (!Configure::check('Tus')) {
+            Configure::load('BEdita/Tus.config');
+        }
     }
 
     /**
