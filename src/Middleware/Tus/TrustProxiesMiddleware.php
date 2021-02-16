@@ -57,12 +57,12 @@ class TrustProxiesMiddleware implements TusMiddleware
             unset($config['headers']);
         }
 
-        if ($headers && is_string($config['headers'])) {
+        if ($headers && is_string($headers)) {
             $config['headers'] = explode(',', trim($headers));
         }
 
         $proxies = Hash::get($config, 'proxies');
-        if ($proxies && is_string($config['proxies']) && $proxies !== '*') {
+        if ($proxies && is_string($proxies) && $proxies !== '*') {
             $config['proxies'] = explode(',', trim($proxies));
         }
 
