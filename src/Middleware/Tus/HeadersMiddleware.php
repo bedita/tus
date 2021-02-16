@@ -47,7 +47,7 @@ class HeadersMiddleware implements TusMiddleware
     public function __construct(array $config = [])
     {
         $exclude = Hash::get($config, 'exclude');
-        if ($exclude && is_string($config['headers'])) {
+        if ($exclude && is_string($exclude)) {
             $config['exclude'] = explode(',', trim($exclude));
         }
         $this->setConfig($config);
