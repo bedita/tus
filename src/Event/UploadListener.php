@@ -148,11 +148,7 @@ class UploadListener
             $action = new SaveEntityAction(['table' => $this->Table]);
             $entity = $action(compact('entity', 'data'));
 
-            /** @var \BEdita\Core\Model\Entity\ObjectType $objectType */
-            $objectType = $this->getConfig('objectType');
-
-            $stream = $this->Streams->newEntity();
-
+            // save stream and create related object
             $resource = fopen($file->getFilePath(), 'r');
             $streamData = [
                 'file_name' => Hash::get($fileMeta, 'name'),
@@ -160,7 +156,7 @@ class UploadListener
                 'contents' => $resource,
             ];
 
-            // save stream and create related object
+            $stream = $this->Streams->newEntity();
             $stream->object_id = $entity->id;
             $action = new SaveEntityAction(['table' => $this->Streams]);
             $stream = $action([
@@ -176,7 +172,10 @@ class UploadListener
                 $this->log(sprintf('Error removing temporary file uplaoded in %s destination', $srcPath));
             }
 
-            $action = new GetObjectAction(['table' => $this->Table, 'objectType' => $objectType]);
+            $action = new GetObjectAction([
+                'table' => $this->Table,
+                'objectType' => $this->getConfig('objectType'),
+            ]);
 
             return $action(['primaryKey' => $entity->id]);
         });
