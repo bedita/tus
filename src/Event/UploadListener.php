@@ -1,7 +1,7 @@
 <?php
 /**
  * BEdita, API-first content management framework
- * Copyright 2021 ChannelWeb Srl, Chialab Srl
+ * Copyright 2022 ChannelWeb Srl, Chialab Srl
  *
  * This file is part of BEdita: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -18,10 +18,10 @@ use BEdita\Core\Model\Action\SaveEntityAction;
 use BEdita\Core\Model\Entity\ObjectEntity;
 use BEdita\Core\Model\Entity\ObjectType;
 use BEdita\Core\Model\Table\MediaTable;
-use BEdita\Core\Model\Table\StreamsTable;
 use BEdita\Tus\Http\Server;
 use Cake\Core\InstanceConfigTrait;
-use Cake\Http\Exception\InternalErrorException;
+use Cake\Event\EventDispatcherTrait;
+use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Utility\Hash;
 use TusPhp\Events\TusEvent;
@@ -32,8 +32,10 @@ use TusPhp\File;
  */
 class UploadListener
 {
+    use EventDispatcherTrait;
     use InstanceConfigTrait;
     use LocatorAwareTrait;
+    use LogTrait;
 
     /**
      * StreamsTable instance.
@@ -79,12 +81,7 @@ class UploadListener
 
         $this->setTable($objectType->alias);
 
-        // force a new instance of StreamsTable to ensure to not modifing existing one
-        $this->Streams = $this->getTableLocator()->get('TusStreams', [
-            'className' => StreamsTable::class,
-        ]);
-
-        $this->Streams->addBehavior('BEdita/Tus.RelaxStreams');
+        $this->Streams = $this->getTableLocator()->get('Streams');
     }
 
     /**
@@ -141,24 +138,6 @@ class UploadListener
     {
         return $this->Table->getConnection()->transactional(function () use ($file) {
             $fileMeta = $file->details();
-            /** @var \BEdita\Core\Model\Entity\ObjectType $objectType */
-            $objectType = $this->getConfig('objectType');
-
-            // move file to default place and save stream
-            $srcPath = sprintf('%s://%s/%s', $this->getConfig('filesystem'), $this->getConfig('uploadDir'), $fileMeta['name']);
-
-            $stream = $this->Streams->newEntity();
-            $stream->file_name = $fileMeta['name'];
-            $stream->mime_type = Hash::get($fileMeta, 'metadata.type');
-            $stream->uri = $stream->filesystemPath();
-            $stream->file_size = Hash::get($fileMeta, 'size');
-            $stream->hash_md5 = '';
-            $stream->hash_sha1 = '';
-
-            $mountManager = FilesystemRegistry::getMountManager();
-            if (!$mountManager->move($srcPath, $stream->uri)) {
-                throw new InternalErrorException(sprintf('Error moving file in %s destination', $stream->uri));
-            }
 
             // create media type
             $entity = $this->Table->newEntity();
@@ -169,14 +148,33 @@ class UploadListener
             $action = new SaveEntityAction(['table' => $this->Table]);
             $entity = $action(compact('entity', 'data'));
 
+            /** @var \BEdita\Core\Model\Entity\ObjectType $objectType */
+            $objectType = $this->getConfig('objectType');
+
+            $stream = $this->Streams->newEntity();
+
+            $resource = fopen($file->getFilePath(), 'r');
+            $streamData = [
+                'file_name' => Hash::get($fileMeta, 'name'),
+                'mime_type' => Hash::get($fileMeta, 'metadata.type'),
+                'contents' => $resource,
+            ];
+
             // save stream and create related object
             $stream->object_id = $entity->id;
             $action = new SaveEntityAction(['table' => $this->Streams]);
             $stream = $action([
                 'entity' => $stream,
-                'data' => [],
-                'entityOptions' => ['validate' => 'relax'],
+                'data' => $streamData,
             ]);
+            fclose($resource);
+
+            // remove uploaded file
+            $srcPath = sprintf('%s://%s/%s', $this->getConfig('filesystem'), $this->getConfig('uploadDir'), $fileMeta['name']);
+            $mountManager = FilesystemRegistry::getMountManager();
+            if (!$mountManager->delete($srcPath)) {
+                $this->log(sprintf('Error removing temporary file uplaoded in %s destination', $srcPath));
+            }
 
             $action = new GetObjectAction(['table' => $this->Table, 'objectType' => $objectType]);
 
