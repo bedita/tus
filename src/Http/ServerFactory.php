@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -116,7 +118,7 @@ class ServerFactory
      *
      * @return $this
      */
-    protected function setupFilesystem(): ServerFactory
+    protected function setupFilesystem()
     {
         $adapter = FilesystemRegistry::getInstance()->get($this->getConfig('filesystem'));
 

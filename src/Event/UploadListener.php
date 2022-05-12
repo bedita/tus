@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2022 ChannelWeb Srl, Chialab Srl
@@ -140,7 +142,7 @@ class UploadListener
             $fileMeta = $file->details();
 
             // create media type
-            $entity = $this->Table->newEntity();
+            $entity = $this->Table->newEmptyEntity();
             $entity->set('type', $this->Table->objectType()->name);
             $data = [
                 'title' => Hash::get($fileMeta, 'metadata.title', $fileMeta['name']),

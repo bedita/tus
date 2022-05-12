@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -20,7 +22,7 @@ use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
 use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
 use Cake\Utility\Hash;
 use TusPhp\Events\UploadComplete;
@@ -43,7 +45,7 @@ class TusController extends Controller
     protected $allowedTypes = null;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function initialize(): void
     {
@@ -63,10 +65,10 @@ class TusController extends Controller
     /**
      * Before filter operations.
      *
-     * @param \Cake\Event\Event $event The event
+     * @param \Cake\Event\EventInterface $event The event
      * @return void
      */
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event): void
     {
         parent::beforeFilter($event);
 

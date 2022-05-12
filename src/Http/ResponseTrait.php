@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -32,7 +34,7 @@ trait ResponseTrait
         $response = new Response();
         $response = $response->withStatus($httpResponse->getStatusCode());
         foreach ($httpResponse->headers->all() as $k => $v) {
-            $response = $response->withHeader($k, $v);
+            $response = $response->withHeader((string)$k, $v);
         }
         if ($httpResponse->getContent() !== false) {
             $stream = new Stream('php://memory', 'rw');

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -61,7 +63,7 @@ class Server extends TusServer
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function serve()
     {

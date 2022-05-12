@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -16,6 +18,7 @@ use BEdita\Tus\Middleware\TusMiddleware;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Core\PluginApplicationInterface;
+use Cake\Http\MiddlewareQueue;
 
 /**
  * Plugin for BEdita\Tus
@@ -27,7 +30,7 @@ class Plugin extends BasePlugin
      *
      * Load Tus configuration.
      */
-    public function bootstrap(PluginApplicationInterface $app)
+    public function bootstrap(PluginApplicationInterface $app): void
     {
         parent::bootstrap($app);
 
@@ -37,11 +40,10 @@ class Plugin extends BasePlugin
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function middleware($middleware)
+    public function middleware(MiddlewareQueue $middleware): MiddlewareQueue
     {
-        /** @var \Cake\Http\MiddlewareQueue $middleware */
         $middleware->insertAt(0, new TusMiddleware(Configure::read('Tus')));
 
         return $middleware;
