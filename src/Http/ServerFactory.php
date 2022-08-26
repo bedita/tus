@@ -99,17 +99,19 @@ class ServerFactory
     /**
      * Ensure upload directory.
      *
-     * @return bool
+     * @return void
+     * @throws \League\Flysystem\UnableToCreateDirectory
      */
-    protected function ensureUploadDir(): bool
+    protected function ensureUploadDir(): void
     {
         $uploadDir = $this->getConfig('uploadDir');
         $manager = FilesystemRegistry::getMountManager();
-        if ($manager->fileExists($uploadDir)) {
-            return true;
+        $dir = sprintf('%s://%s', $this->getConfig('filesystem'), $uploadDir);
+        if ($manager->fileExists($dir)) {
+            return;
         }
 
-        return $manager->createDirectory($uploadDir);
+        $manager->createDirectory($dir);
     }
 
     /**
