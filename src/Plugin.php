@@ -42,10 +42,10 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    public function middleware(MiddlewareQueue $middleware): MiddlewareQueue
-    {
-        $middleware->insertAt(0, new TusMiddleware(Configure::read('Tus')));
+    // public function middleware(MiddlewareQueue $middleware): MiddlewareQueue
+    // {
+    //     $middleware->insertAt(0, new TusMiddleware(Configure::read('Tus')));
 
-        return $middleware;
-    }
+    //     return $middleware;
+    // }
 }
