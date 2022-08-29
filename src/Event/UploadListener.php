@@ -158,7 +158,7 @@ class UploadListener
                 'contents' => $resource,
             ];
 
-            $stream = $this->Streams->newEntity();
+            $stream = $this->Streams->newEmptyEntity();
             $stream->object_id = $entity->id;
             $action = new SaveEntityAction(['table' => $this->Streams]);
             $stream = $action([
