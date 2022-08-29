@@ -14,11 +14,9 @@ declare(strict_types=1);
  */
 namespace BEdita\Tus;
 
-use BEdita\Tus\Middleware\TusMiddleware;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Core\PluginApplicationInterface;
-use Cake\Http\MiddlewareQueue;
 
 /**
  * Plugin for BEdita\Tus
