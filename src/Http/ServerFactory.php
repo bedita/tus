@@ -95,8 +95,8 @@ class ServerFactory
         TusConfig::set($this->getConfig('server'));
         $this->tusServer = new Server($this->getConfig('cache'));
 
-        $headersMiddleware = new HeadersMiddleware((array)$this->getConfig('middleware.headers'));
-        $trustedProxies = new TrustProxiesMiddleware((array)$this->getConfig('middleware.trustedProxies'));
+        $headersMiddleware = new HeadersMiddleware((array)$this->getConfig('headers'));
+        $trustedProxies = new TrustProxiesMiddleware((array)$this->getConfig('trustedProxies'));
         $this->tusServer->middleware()
             ->add($headersMiddleware)
             ->add($trustedProxies);
