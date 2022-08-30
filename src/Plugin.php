@@ -14,9 +14,12 @@ declare(strict_types=1);
  */
 namespace BEdita\Tus;
 
+use BEdita\API\Middleware\CorsMiddleware;
+use BEdita\Tus\Middleware\TusMiddleware;
 use Cake\Core\BasePlugin;
 use Cake\Core\Configure;
 use Cake\Core\PluginApplicationInterface;
+use Cake\Http\MiddlewareQueue;
 
 /**
  * Plugin for BEdita\Tus
@@ -40,10 +43,10 @@ class Plugin extends BasePlugin
     /**
      * @inheritDoc
      */
-    // public function middleware(MiddlewareQueue $middleware): MiddlewareQueue
-    // {
-    //     $middleware->insertAt(0, new TusMiddleware(Configure::read('Tus')));
+    public function middleware(MiddlewareQueue $middleware): MiddlewareQueue
+    {
+        $middleware->insertBefore(CorsMiddleware::class, new TusMiddleware(Configure::read('Tus')));
 
-    //     return $middleware;
-    // }
+        return $middleware;
+    }
 }

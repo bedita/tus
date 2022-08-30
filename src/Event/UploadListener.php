@@ -170,7 +170,9 @@ class UploadListener
             // remove uploaded file
             $srcPath = sprintf('%s://%s/%s', $this->getConfig('filesystem'), $this->getConfig('uploadDir'), $fileMeta['name']);
             $mountManager = FilesystemRegistry::getMountManager();
-            if (!$mountManager->delete($srcPath)) {
+            try {
+                $mountManager->delete($srcPath);
+            } catch (\Exception $e) {
                 $this->log(sprintf('Error removing temporary file uplaoded in %s destination', $srcPath));
             }
 

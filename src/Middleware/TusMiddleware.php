@@ -14,6 +14,8 @@ declare(strict_types=1);
  */
 namespace BEdita\Tus\Middleware;
 
+use BEdita\Tus\Http\ResponseTrait;
+use BEdita\Tus\Http\ServerFactory;
 use Cake\Core\InstanceConfigTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,6 +28,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 class TusMiddleware implements MiddlewareInterface
 {
     use InstanceConfigTrait;
+    use ResponseTrait;
 
     /**
      * Default configuration.
@@ -59,10 +62,13 @@ class TusMiddleware implements MiddlewareInterface
     {
         /** @var \Cake\Http\ServerRequest $request */
         $path = $request->getUri()->getPath();
-        if ($request->getMethod() === 'OPTIONS' && strpos($path, $this->getConfig('endpoint')) === 0) {
-            $handler->handle($request); // skip BEdita/API CORS middleware
+        if ($request->getMethod() !== 'OPTIONS' || strpos($path, $this->getConfig('endpoint')) !== 0) {
+            return $handler->handle($request);
         }
 
-        return $handler->handle($request);
+        $config = $this->getConfig();
+        $config['endpoint'] = $path;
+
+        return $this->toCakeResponse(ServerFactory::create($config)->serve());
     }
 }

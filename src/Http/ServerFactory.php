@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * BEdita, API-first content management framework
- * Copyright 2021 ChannelWeb Srl, Chialab Srl
+ * Copyright 2022 ChannelWeb Srl, Chialab Srl
  *
  * This file is part of BEdita: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -17,6 +17,8 @@ namespace BEdita\Tus\Http;
 use BEdita\AWS\Filesystem\Adapter\S3Adapter;
 use BEdita\Core\Filesystem\Adapter\LocalAdapter;
 use BEdita\Core\Filesystem\FilesystemRegistry;
+use BEdita\Tus\Middleware\Tus\HeadersMiddleware;
+use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
 use Cake\Core\InstanceConfigTrait;
 use Cake\Http\Exception\InternalErrorException;
 use TusPhp\Config as TusConfig;
@@ -39,6 +41,8 @@ class ServerFactory
         'cache' => 'file',
         'server' => null,
         'endpoint' => '/tus',
+        'headers' => null,
+        'trustedProxies' => null,
     ];
 
     /**
@@ -90,6 +94,12 @@ class ServerFactory
 
         TusConfig::set($this->getConfig('server'));
         $this->tusServer = new Server($this->getConfig('cache'));
+
+        $headersMiddleware = new HeadersMiddleware((array)$this->getConfig('middleware.headers'));
+        $trustedProxies = new TrustProxiesMiddleware((array)$this->getConfig('middleware.trustedProxies'));
+        $this->tusServer->middleware()
+            ->add($headersMiddleware)
+            ->add($trustedProxies);
 
         return $this->tusServer
             ->setUploadDir($this->uploadPath)

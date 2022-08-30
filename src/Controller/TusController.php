@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * BEdita, API-first content management framework
- * Copyright 2021 ChannelWeb Srl, Chialab Srl
+ * Copyright 2022 ChannelWeb Srl, Chialab Srl
  *
  * This file is part of BEdita: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -19,13 +19,10 @@ use BEdita\API\Policy\EndpointPolicy;
 use BEdita\Tus\Event\UploadListener;
 use BEdita\Tus\Http\ResponseTrait;
 use BEdita\Tus\Http\ServerFactory;
-use BEdita\Tus\Middleware\Tus\HeadersMiddleware;
-use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
 use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Utility\Hash;
 use TusPhp\Events\UploadComplete;
 
 /**
@@ -62,14 +59,6 @@ class TusController extends AppController
     /**
      * @inheritDoc
      */
-    protected function isIdentityRequired(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function checkAcceptable(): void
     {
     }
@@ -83,10 +72,6 @@ class TusController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-
-        // if ($this->request->getMethod() === 'OPTIONS') {
-        //     $this->Auth->allow('server');
-        // }
 
         $mediaId = $this->ObjectTypes->get('media')->id;
         $this->allowedTypes = $this->ObjectTypes->find('children', ['for' => $mediaId])
@@ -110,12 +95,6 @@ class TusController extends AppController
         $tusConf = Configure::read('Tus');
         $tusConf['endpoint'] .= '/' . $type;
         $server = ServerFactory::create($tusConf);
-
-        $headersMiddleware = new HeadersMiddleware((array)Hash::get($tusConf, 'headers'));
-        $trustedProxies = new TrustProxiesMiddleware((array)Hash::get($tusConf, 'trustedProxies'));
-        $server->middleware()
-            ->add($headersMiddleware)
-            ->add($trustedProxies);
 
         $listener = new UploadListener(['objectType' => $objectType] + $tusConf);
         $server->event()->addListener(UploadComplete::NAME, [$listener, 'onUploadComplete']);
