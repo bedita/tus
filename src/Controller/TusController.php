@@ -28,8 +28,8 @@ use TusPhp\Events\UploadComplete;
 /**
  * Tus controller. Expose Tus server.
  *
- * @property-read \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
- * @property-read \BEdita\Tus\Controller\Component\UploadComponent $Upload
+ * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
+ * @property \BEdita\Tus\Controller\Component\UploadComponent $Upload
  */
 class TusController extends AppController
 {
