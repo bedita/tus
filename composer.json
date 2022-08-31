@@ -1,17 +1,18 @@
 {
     "name": "bedita/tus",
-    "description": "BEdita/Tus plugin for CakePHP",
+    "description": "Tus plugin for BEdita 5",
     "type": "cakephp-plugin",
     "license": "LGPL-3.0-or-later",
     "require": {
-        "bedita/core": "*",
-        "bedita/api": "*",
+        "bedita/core": "^5.0.0",
+        "bedita/api": "^5.0.0",
         "ankitpokhrel/tus-php": "^2.2",
-        "bedita/aws": "^1.0"
+        "bedita/aws": "^3.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7.14|^6.0",
-        "cakephp/cakephp-codesniffer": "~3.2.1"
+        "phpunit/phpunit": "^8.5",
+        "cakephp/cakephp-codesniffer": "~4.5.1",
+        "phpstan/phpstan": "^1.5"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +26,14 @@
         }
     },
     "scripts": {
-        "cs-check": "vendor/bin/phpcs -p src/ tests/",
-        "cs-fix": "vendor/bin/phpcbf -p src/ tests/"
+        "stan": "vendor/bin/phpstan analyse",
+        "cs-check": "vendor/bin/phpcs",
+        "cs-fix": "vendor/bin/phpcbf",
+        "test": "vendor/bin/phpunit --colors=always"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     }
 }

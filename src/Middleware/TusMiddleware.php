@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -12,16 +14,21 @@
  */
 namespace BEdita\Tus\Middleware;
 
+use BEdita\Tus\Http\ResponseTrait;
+use BEdita\Tus\Http\ServerFactory;
 use Cake\Core\InstanceConfigTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * TusMiddleware middleware
  */
-class TusMiddleware
+class TusMiddleware implements MiddlewareInterface
 {
     use InstanceConfigTrait;
+    use ResponseTrait;
 
     /**
      * Default configuration.
@@ -49,20 +56,19 @@ class TusMiddleware
     }
 
     /**
-     * Invoke method.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
-     * @param \Psr\Http\Message\ResponseInterface $response The response.
-     * @param callable $next Callback to invoke the next middleware.
-     * @return \Psr\Http\Message\ResponseInterface A response
+     * @inheritDoc
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, $next)
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        /** @var \Cake\Http\ServerRequest $request */
         $path = $request->getUri()->getPath();
-        if ($request->getMethod() === 'OPTIONS' && strpos($path, $this->getConfig('endpoint')) === 0) {
-            $next($request, $response); // skip BEdita/API CORS middleware
+        if ($request->getMethod() !== 'OPTIONS' || strpos($path, $this->getConfig('endpoint')) !== 0) {
+            return $handler->handle($request);
         }
 
-        return $next($request, $response);
+        $config = $this->getConfig();
+        $config['endpoint'] = $path;
+
+        return $this->toCakeResponse(ServerFactory::create($config)->serve());
     }
 }

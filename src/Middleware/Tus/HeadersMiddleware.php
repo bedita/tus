@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
  * Copyright 2021 ChannelWeb Srl, Chialab Srl
@@ -33,6 +35,7 @@ class HeadersMiddleware implements TusMiddleware
      * Default configuration:
      *
      *  - `excludeHeaders` the headers to not set.
+     *
      * @var array
      */
     protected $_defaultConfig = [
@@ -54,7 +57,7 @@ class HeadersMiddleware implements TusMiddleware
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function handle(Request $request, Response $response)
     {

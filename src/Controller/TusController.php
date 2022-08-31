@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
+
 /**
  * BEdita, API-first content management framework
- * Copyright 2021 ChannelWeb Srl, Chialab Srl
+ * Copyright 2022 ChannelWeb Srl, Chialab Srl
  *
  * This file is part of BEdita: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -12,26 +14,24 @@
  */
 namespace BEdita\Tus\Controller;
 
+use BEdita\API\Controller\AppController;
+use BEdita\API\Policy\EndpointPolicy;
 use BEdita\Tus\Event\UploadListener;
 use BEdita\Tus\Http\ResponseTrait;
 use BEdita\Tus\Http\ServerFactory;
-use BEdita\Tus\Middleware\Tus\HeadersMiddleware;
-use BEdita\Tus\Middleware\Tus\TrustProxiesMiddleware;
-use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\Datasource\EntityInterface;
-use Cake\Event\Event;
+use Cake\Event\EventInterface;
 use Cake\Http\Exception\BadRequestException;
-use Cake\Utility\Hash;
 use TusPhp\Events\UploadComplete;
 
 /**
  * Tus controller. Expose Tus server.
  *
- * @property-read \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
- * @property-read \BEdita\Tus\Controller\Component\UploadComponent $Upload
+ * @property \BEdita\Core\Model\Table\ObjectTypesTable $ObjectTypes
+ * @property \BEdita\Tus\Controller\Component\UploadComponent $Upload
  */
-class TusController extends Controller
+class TusController extends AppController
 {
     use ResponseTrait;
 
@@ -43,36 +43,35 @@ class TusController extends Controller
     protected $allowedTypes = null;
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function initialize(): void
     {
         parent::initialize();
+        if ($this->components()->has('JsonApi')) {
+            $this->components()->unload('JsonApi');
+        }
+        $this->request = $this->request->withAttribute(EndpointPolicy::DEFAULT_AUTHORIZED, true);
 
-        $this->loadComponent('Auth', [
-            'authenticate' => ['BEdita/API.Jwt'],
-            'loginAction' => ['_name' => 'api:login'],
-            'loginRedirect' => ['_name' => 'api:login'],
-            'unauthorizedRedirect' => false,
-            'storage' => 'Memory',
-        ]);
+        $this->ObjectTypes = $this->fetchTable('ObjectTypes');
+    }
 
-        $this->loadModel('ObjectTypes');
+    /**
+     * @inheritDoc
+     */
+    protected function checkAcceptable(): void
+    {
     }
 
     /**
      * Before filter operations.
      *
-     * @param \Cake\Event\Event $event The event
+     * @param \Cake\Event\EventInterface $event The event
      * @return void
      */
-    public function beforeFilter(Event $event): void
+    public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-
-        if ($this->request->getMethod() === 'OPTIONS') {
-            $this->Auth->allow('server');
-        }
 
         $mediaId = $this->ObjectTypes->get('media')->id;
         $this->allowedTypes = $this->ObjectTypes->find('children', ['for' => $mediaId])
@@ -96,12 +95,6 @@ class TusController extends Controller
         $tusConf = Configure::read('Tus');
         $tusConf['endpoint'] .= '/' . $type;
         $server = ServerFactory::create($tusConf);
-
-        $headersMiddleware = new HeadersMiddleware((array)Hash::get($tusConf, 'headers'));
-        $trustedProxies = new TrustProxiesMiddleware((array)Hash::get($tusConf, 'trustedProxies'));
-        $server->middleware()
-            ->add($headersMiddleware)
-            ->add($trustedProxies);
 
         $listener = new UploadListener(['objectType' => $objectType] + $tusConf);
         $server->event()->addListener(UploadComplete::NAME, [$listener, 'onUploadComplete']);
