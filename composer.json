@@ -4,10 +4,10 @@
     "type": "cakephp-plugin",
     "license": "LGPL-3.0-or-later",
     "require": {
-        "bedita/core": "dev-5-salix",
-        "bedita/api": "dev-5-salix",
+        "bedita/core": "^5.0.0",
+        "bedita/api": "^5.0.0",
         "ankitpokhrel/tus-php": "^2.2",
-        "bedita/aws": "dev-feat/cake4-bedita5"
+        "bedita/aws": "^3.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5",
