@@ -38,6 +38,6 @@ class RedisStore extends TusRedisStore
             $this->ttl
         );
 
-        return 'OK' === $status->getPayload();
+        return $status->getPayload() === 'OK';
     }
 }
