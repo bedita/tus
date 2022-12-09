@@ -14,6 +14,7 @@ declare(strict_types=1);
  */
 namespace BEdita\Tus\Http;
 
+use BEdita\Tus\Cache\RedisStore;
 use Cake\Utility\Hash;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use TusPhp\Tus\Server as TusServer;
@@ -96,5 +97,22 @@ class Server extends TusServer
         }
 
         return parent::handleHead();
+    }
+
+    /**
+     * Set cache.
+     *
+     * @param mixed $cache Cache configuration
+     * @return self
+     */
+    public function setCache($cache): self
+    {
+        if ($cache !== 'redis') {
+            return parent::setCache($cache);
+        }
+        $this->cache = new RedisStore();
+        $this->cache->setPrefix('tus:server:');
+
+        return $this;
     }
 }
