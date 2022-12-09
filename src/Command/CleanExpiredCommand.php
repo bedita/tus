@@ -21,8 +21,8 @@ use Cake\Console\ConsoleIo;
 use Cake\Core\Configure;
 use Cake\Utility\Hash;
 use Carbon\Carbon;
-use TusPhp\Config as TusConfig;
-use TusPhp\Tus\Server as TusServer;
+use TusPhp\Config;
+use TusPhp\Tus\Server;
 
 /**
  * Remove expired items (finished or unfinished) from TUS cache.
@@ -60,17 +60,30 @@ class CleanExpiredCommand extends Command
         return null;
     }
 
-    protected function tusServer(): TusServer
+    /**
+     * Create custom TUS server, overriding `isExpired` method
+     *
+     * @return \TusPhp\Tus\Server
+     */
+    protected function tusServer(): Server
     {
-        TusConfig::set(Configure::read('Tus.server'));
+        Config::set(Configure::read('Tus.server'));
 
-        return new class (Configure::read('Tus.cache')) extends TusServer
+        return new class (Configure::read('Tus.cache')) extends Server
         {
             protected function isExpired($contents): bool
             {
                 $expiresAt = Hash::get((array)$contents, 'expires_at');
 
                 return empty($expiresAt) || Carbon::parse($expiresAt)->lt(Carbon::now());
+            }
+
+            public function setCache($cache): self
+            {
+                parent::setCache($cache);
+                $this->cache->setPrefix('tus:server:');
+
+                return $this;
             }
         };
     }
