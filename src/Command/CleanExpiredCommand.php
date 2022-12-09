@@ -71,6 +71,12 @@ class CleanExpiredCommand extends Command
 
         return new class (Configure::read('Tus.cache')) extends Server
         {
+            /**
+             * Check if content is expired - even if upload is completed
+             *
+             * @param array|null $contents Cache content
+             * @return bool
+             */
             protected function isExpired($contents): bool
             {
                 $expiresAt = Hash::get((array)$contents, 'expires_at');
@@ -78,6 +84,12 @@ class CleanExpiredCommand extends Command
                 return empty($expiresAt) || Carbon::parse($expiresAt)->lt(Carbon::now());
             }
 
+            /**
+             * Set cache.
+             *
+             * @param mixed $cache Cache configuration
+             * @return self
+             */
             public function setCache($cache): self
             {
                 parent::setCache($cache);
