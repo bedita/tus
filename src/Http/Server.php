@@ -38,6 +38,13 @@ class Server extends TusServer
     public const BEDITA_OBJECT_TYPE_HEADER = 'BEdita-Object-Type';
 
     /**
+     * Checksum Mismatch status code
+     *
+     * @var int
+     */
+    public const HTTP_CHECKSUM_MISMATCH = 460;
+
+    /**
      * Update cache with info about bedita object created.
      *
      * @return void
@@ -96,5 +103,22 @@ class Server extends TusServer
         }
 
         return parent::handleHead();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Make sure file is removed if a checksum error response is sent.
+     */
+    protected function handlePatch(): HttpResponse
+    {
+        $response = parent::handlePatch();
+        if ($response->getStatusCode() === static::HTTP_CHECKSUM_MISMATCH) {
+            $meta = $this->cache->get($this->request->key());
+            $resource = $meta['file_path'] ?? null;
+            unlink($resource);
+        }
+
+        return $response;
     }
 }
